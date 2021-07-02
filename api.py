@@ -1,6 +1,7 @@
 from auth import run
 import requests
 import json
+from utils import *
 class ValoApi:
     
     def __init__(self, username, password, region):
@@ -9,7 +10,6 @@ class ValoApi:
         self.region = region
 
         self.header,self.userID=self.login()
-        self.gname,self.tag=self.name()
 
     def login(self):
         header,userID=run(self.username, self.password)
@@ -23,7 +23,7 @@ class ValoApi:
         details=r.json()
         gname=details[0]['GameName']
         tag="#"+details[0]['TagLine']
-        return gname,tag
+        print(f"WELCOME {gname} {tag}")
     
     def match(self):
         head2 = {'Content-Type': 'application/json',}
@@ -32,32 +32,45 @@ class ValoApi:
         r=requests.get(f"https://pd.{self.region}.a.pvp.net/mmr/v1/players/{self.userID}/competitiveupdates?startIndex={start}&endIndex={start+20}", headers=head2)
         data=r.json()
         print(json.dumps(data,indent=2))
-        '''
-        tier=""
-        rr=""
+       
+    def curRank(self):    
+        start=0
         while(start<=100):
-            r=requests.get(f"https://pd.{self.region}.a.pvp.net/mmr/v1/players/{self.userID}/competitiveupdates?startIndex={start}&endIndex={start+20}", headers=head2)
+            if start==100:
+                print("unranked")
+                break
+            r=requests.get(f"https://pd.{self.region}.a.pvp.net/mmr/v1/players/{self.userID}/competitiveupdates?startIndex={start}&endIndex={start+20}", headers=self.header)
             data=r.json()
             for i in data['Matches']:
-                if i['RankedRatingEarned']!=0:
-                    tier=i['TierAfterUpdate']
-                    rr=i['RankedRatingAfterUpdate']
+                if i['TierAfterUpdate']!=0 and dateValidity(i['SeasonID']):
+                    print(f"Tier: {ranks[i['TierAfterUpdate']//3]} {i['TierAfterUpdate']%3 +1}")
+                    print("Ranked Rating:",i['RankedRatingAfterUpdate'])
                     start=101
-                    break
+                    break  
                 else:
                     start=start+20
+                    break
         
-        print(tier,rr)'''
+        
     
     def store(self):
          r = requests.get(f'https://pd.{self.region}.a.pvp.net/store/v2/storefront/{self.userID}', headers=self.header)
          data=r.json()
          single_skins = data["SkinsPanelLayout"]["SingleItemOffers"]
+         print("Today's items:")
          for skin in single_skins:
              res= requests.get(f"https://valorant-api.com/v1/weapons/skinlevels/{skin}")
              data=res.json()
              print(data['data']['displayName'])
     
-    '''def mmr(self):
-         r = requests.get(f'https://pd.{self.region}.a.pvp.net/mmr/v1/players/{self.userID}', headers=self.header)
-         print(r.json())'''
+    def wallet(self):
+        r = requests.get(f'https://pd.{self.region}.a.pvp.net/store/v1/wallet/{self.userID}', headers=self.header)
+        data=r.json()
+        print("Valorant Points (VP) :",data['Balances'][currencies['VP']])
+        print("Radianite Points (RP) :",data['Balances'][currencies['RP']])
+             
+    '''
+    def mmr(self):
+         r = requests.get(f'https://shared.ap.a.pvp.net/content-service/v2/content', headers=self.header)
+         print(r.json()) 
+    '''
