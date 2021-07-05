@@ -8,8 +8,8 @@ class ValoApi:
         self.username = username
         self.password = password
         self.region = region
-
         self.header,self.userID=self.login()
+        self.name()   
 
     def login(self):
         header,userID=run(self.username, self.password)
@@ -31,27 +31,12 @@ class ValoApi:
         start=0
         r=requests.get(f"https://pd.{self.region}.a.pvp.net/mmr/v1/players/{self.userID}/competitiveupdates?startIndex={start}&endIndex={start+20}", headers=head2)
         data=r.json()
-        print(json.dumps(data,indent=2))
-       
-    def curRank(self):    
-        start=0
-        while(start<=100):
-            if start==100:
-                print("unranked")
-                break
-            r=requests.get(f"https://pd.{self.region}.a.pvp.net/mmr/v1/players/{self.userID}/competitiveupdates?startIndex={start}&endIndex={start+20}", headers=self.header)
-            data=r.json()
-            for i in data['Matches']:
-                if i['TierAfterUpdate']!=0 and dateValidity(i['SeasonID']):
-                    print(f"Tier: {ranks[i['TierAfterUpdate']//3]} {i['TierAfterUpdate']%3 +1}")
-                    print("Ranked Rating:",i['RankedRatingAfterUpdate'])
-                    start=101
-                    break  
-                else:
-                    start=start+20
-                    break
+        print(json.dumps(data,indent=2))   
         
-        
+    def inventory(self):
+        r = requests.get(f'https://pd.{self.region}.a.pvp.net/personalization/v2/players/{self.userID}/playerloadout', headers=self.header)
+        data=r.json()
+        print(json.dumps(data,indent=2))    
     
     def store(self):
          r = requests.get(f'https://pd.{self.region}.a.pvp.net/store/v2/storefront/{self.userID}', headers=self.header)
@@ -69,8 +54,39 @@ class ValoApi:
         print("Valorant Points (VP) :",data['Balances'][currencies['VP']])
         print("Radianite Points (RP) :",data['Balances'][currencies['RP']])
              
-    '''
+    
     def mmr(self):
-         r = requests.get(f'https://shared.ap.a.pvp.net/content-service/v2/content', headers=self.header)
-         print(r.json()) 
+        r = requests.get(f'https://pd.ap.a.pvp.net/mmr/v1/players/{self.userID}/', headers=self.header)
+        data=r.json()
+        data2=data['QueueSkills']['competitive']
+        if data2["TotalGamesNeededForRating"]==0:
+            for i in data2['SeasonalInfoBySeasonID']:
+                if dateValidity(i):
+                    rankNo=data2['SeasonalInfoBySeasonID'][i]['Rank']
+                    print(f"Tier: {ranks[rankNo//3]} {rankNo%3 +1}")
+                    print("Ranked Rating:",data2['SeasonalInfoBySeasonID'][i]['RankedRating'])
+        else:
+            print(data2["TotalGamesNeededForRating"],end=" ")
+            print("matches to play for rank")
+           # print(json.dumps(data['QueueSkills']['competitive'],indent=2))
+
+    '''  
+    BACKUP FUNCTION FOR MMR 
+    def curRank(self):    
+        start=0
+        while(start<=100):
+            if start==100:
+                print("unranked")
+                break
+            r=requests.get(f"https://pd.{self.region}.a.pvp.net/mmr/v1/players/{self.userID}/competitiveupdates?startIndex={start}&endIndex={start+20}", headers=self.header)
+            data=r.json()
+            for i in data['Matches']:
+                if i['TierAfterUpdate']!=0 and dateValidity(i['SeasonID']):
+                    print(f"Tier: {ranks[i['TierAfterUpdate']//3]} {i['TierAfterUpdate']%3 +1}")
+                    print("Ranked Rating:",i['RankedRatingAfterUpdate'])
+                    start=101
+                    break  
+                else:
+                    start=start+20
+                    break
     '''

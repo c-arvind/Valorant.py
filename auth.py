@@ -40,9 +40,12 @@ def run(username, password):
     user_id = data['sub']
     #print('User ID: ' + user_id)
     
+
+    r=client.get('https://valorant-api.com/v1/version')
+    data=r.json()
+    headers['X-Riot-ClientVersion'] =data['data']['riotClientVersion']
     headers['X-Riot-Entitlements-JWT'] = entitlements_token
     headers['X-Riot-ClientPlatform'] = 'ew0KCSJwbGF0Zm9ybVR5cGUiOiAiUEMiLA0KCSJwbGF0Zm9ybU9TIjogIldpbmRvd3MiLA0KCSJwbGF0Zm9ybU9TVmVyc2lvbiI6ICIxMC4wLjE5MDQyLjEuMjU2LjY0Yml0IiwNCgkicGxhdGZvcm1DaGlwc2V0IjogIlVua25vd24iDQp9'
-    headers['X-Riot-ClientVersion'] = 'release-02.01-shipping-6-511946'
     #print(data) 
     return headers,user_id
 

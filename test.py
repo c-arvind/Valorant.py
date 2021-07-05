@@ -13,4 +13,6 @@ except:
 #valo.match()
 #valo.curRank()
 #valo.wallet()
+#valo.inventory()
+valo.mmr()
 
