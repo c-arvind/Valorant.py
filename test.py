@@ -6,13 +6,13 @@ print("REGIONS:\nnorth america - na , asia - ap , europe - eu , korea - ko ")
 region=input("Enter region: ")
 '''
 try:
-    valo=ValoApi('','','')
+    valo=ValoApi('RiotUsername','RiotPassword','Region')
 except:
     print('A login error occurred. F')
 
-#valo.match()
-#valo.curRank()
+
 #valo.wallet()
 #valo.inventory()
-valo.mmr()
+#valo.mmr()
+#valo.store()
 

@@ -24,19 +24,18 @@ class ValoApi:
         gname=details[0]['GameName']
         tag="#"+details[0]['TagLine']
         print(f"WELCOME {gname} {tag}")
-    
-    def match(self):
-        head2 = {'Content-Type': 'application/json',}
-        head2.update(self.header)
-        start=0
-        r=requests.get(f"https://pd.{self.region}.a.pvp.net/mmr/v1/players/{self.userID}/competitiveupdates?startIndex={start}&endIndex={start+20}", headers=head2)
-        data=r.json()
-        print(json.dumps(data,indent=2))   
-        
+          
     def inventory(self):
         r = requests.get(f'https://pd.{self.region}.a.pvp.net/personalization/v2/players/{self.userID}/playerloadout', headers=self.header)
         data=r.json()
-        print(json.dumps(data,indent=2))    
+        print("Equipped Skins from bundles:")
+        for skinID in data['Guns']:
+            res=requests.get(f'https://valorant-api.com/v1/weapons/skins/{skinID["SkinID"]}')
+            data=res.json()
+            if(data["data"]["contentTierUuid"]):
+                print(data["data"]["displayName"])
+            #print(type(data))
+            
     
     def store(self):
          r = requests.get(f'https://pd.{self.region}.a.pvp.net/store/v2/storefront/{self.userID}', headers=self.header)
@@ -70,7 +69,16 @@ class ValoApi:
             print("matches to play for rank")
            # print(json.dumps(data['QueueSkills']['competitive'],indent=2))
 
-    '''  
+    '''
+   COMPE MATCH HISTORY FUNCTION (RETURNS IN JSON)
+   def match(self):
+        head2 = {'Content-Type': 'application/json',}
+        head2.update(self.header)
+        start=0
+        r=requests.get(f"https://pd.{self.region}.a.pvp.net/mmr/v1/players/{self.userID}/competitiveupdates?startIndex={start}&endIndex={start+20}", headers=head2)
+        data=r.json()
+        print(json.dumps(data,indent=2))
+    
     BACKUP FUNCTION FOR MMR 
     def curRank(self):    
         start=0

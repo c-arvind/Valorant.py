@@ -1,7 +1,6 @@
 import aiohttp
-import requests
+import requests.sessions
 import json
-import urllib
 import re
 
 
@@ -39,7 +38,7 @@ def run(username, password):
     data = r.json()
     user_id = data['sub']
     #print('User ID: ' + user_id)
-    
+
 
     r=client.get('https://valorant-api.com/v1/version')
     data=r.json()
